@@ -90,6 +90,7 @@ A1Vec = qcA1(:);
 %Determine the probability of each symbol occuring
 prob=prob/sum(prob);
 
+%symbols=symbols/sum(symbols);
 %Create a Huffman code dictionary using the symbols and probabilities we
 %just found
 [RedA1HuffDict,avglen]=huffmandict(symbols,prob);
