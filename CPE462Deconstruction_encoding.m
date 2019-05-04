@@ -7,7 +7,7 @@ X=uint8(imread('colorwheel.png'));
 
 % Create new image to compare to output
 imwrite(X,'in.png');
-[r,c,p] = size(X);
+[r,c,p] = size(X); %r = rows   c = columns 
 
 % Seperate image by RGB colors
 X1= X(:,:,1);
@@ -100,11 +100,12 @@ encodedA1 = huffmanenco(A1Vec, RedA1HuffDict);
 
 %THESE WILL BE MOVED TO THE DECODER AND ARE JUST FOR TESTING ------%
 %Decode the component
-decodedA1 = huffmandeco(encodedA1, RedA1HuffDict);
-
-%Turn the component from a vector back into an array
-remadeqcA1 = reshape(decodedA1, [256, 256]);
+% decodedA1 = huffmandeco(encodedA1, RedA1HuffDict);
+% 
+% %Turn the component from a vector back into an array
+% remadeqcA1 = reshape(decodedA1, [256, 256]);
 %-------------------------REMOVE LATER ----------------------------------%
+
 
 %Encode horizantal red channel component (qcH1)
 %Turn the component into a vector
@@ -120,6 +121,7 @@ prob=prob/sum(prob);
 
 %Encode the red horizantal component using the dictionary for it
 encodedH1 = huffmanenco(H1Vec, RedH1HuffDict);
+
 
 
 %Encode vertical red channel component (qcV1)
@@ -244,6 +246,7 @@ prob=prob/sum(prob);
 encodedA3 = huffmanenco(A3Vec, BlueA3HuffDict);
 
 
+
 %Encode horizantal blue channel component (qcH3)
 %Turn the component into a vector
 H3Vec = qcH3(:);
@@ -258,6 +261,7 @@ prob=prob/sum(prob);
 
 %Encode the blue horizantal component using the dictionary for it
 encodedH3 = huffmanenco(H3Vec, BlueH3HuffDict);
+
 
 
 %Encode vertical blue channel component (qcV3)
@@ -292,3 +296,244 @@ prob=prob/sum(prob);
 %Encode the blue diagonal component using the dictionary for it
 encodedD3 = huffmanenco(D3Vec, BlueD3HuffDict);
 %-------------------- BLUE CHANNEL -----------------------------%
+
+
+%Combine the 12 encoded components by adding their vectors together end to
+%end with a unique seperating character in between each component. The
+%vectors will be added together in the same order they were encoded (A1,
+%H1, V1, D1 and then repeat for green then blue)
+encodedStream = [encodedA1; 2; encodedH1; 2; encodedV1; 2; encodedD1; 2; encodedA2; 2; encodedH2; 2; encodedV2; 2; encodedD2; 2; encodedA3; 2; encodedH3; 2; encodedV3; 2; encodedD3];
+
+%encodedStream = [encodedA1; encodedH1; encodedV1; encodedD1; encodedA2; encodedH2; encodedV2; encodedD2; encodedA3; encodedH3; encodedV3; encodedD3];
+
+%Convert the stream to logical 1's and 0's 
+binEncodedStream = logical(encodedStream);
+
+%Write the encoded stream to a file
+fileID = fopen('binary.txt', 'w');
+fprintf(fileID, '%d\n', encodedStream);
+%fwrite(fileID, binEncodedStream, 'ubit1');
+
+%This file somehow comes out larger than the original image??
+fclose(fileID);
+
+%Read data out of file Not working
+%readTest = fread(fileID, [1198643, 1]);
+% filedID = fopen('binary.txt', 'r');
+% readTest(:) = fscanf(fileID, '%d');
+% 
+% fclose(fileID);
+
+
+%This stuff will be in the decoding script
+%Import the data from the file
+fileData=importdata('binary.txt');
+%reshape(fileData, [], 1);
+
+
+%----------------- EXTRACT RED CHANNEL COMPONENTS ----------------------%
+%Get A1 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dA1 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+
+%Get H1 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dH1 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+
+%Get V1 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dV1 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+
+%Get D1 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dD1 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+%----------------- EXTRACT RED CHANNEL COMPONENTS ----------------------%
+
+
+%----------------- EXTRACT GREEN CHANNEL COMPONENTS ----------------------%
+%Get A2 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dA2 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+
+%Get H2 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dH2 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+
+%Get V2 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dV2 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+
+%Get D2 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dD2 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+%----------------- EXTRACT GREEN CHANNEL COMPONENTS ----------------------%
+
+
+%----------------- EXTRACT BLUE CHANNEL COMPONENTS ----------------------%
+%Get A3 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dA3 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+
+%Get H3 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dH3 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+
+%Get V3 from encoded data stream
+for i = 1:length(fileData)
+   if fileData(i) == 2
+       dV3 = fileData(1:i-1);
+       fileData = fileData(i+1:end);
+       break;
+   end    
+end
+
+%Get D3 from encoded data stream
+dD3 = fileData;
+%----------------- EXTRACT BLUE CHANNEL COMPONENTS ----------------------%
+
+%----------------- DECODE RED COMPONENTS --------------------------------%
+
+%Decode A1 component
+decodedA1 = huffmandeco(dA1, RedA1HuffDict);
+%Turn the component from a vector back into an array
+decodedA1 = reshape(decodedA1, [256, 256]);
+
+
+%Decode H1 component
+decodedH1 = huffmandeco(dH1, RedH1HuffDict);
+%Turn the component from a vector back into an array
+decodedH1 = reshape(decodedH1, [256, 256]);
+
+
+%Decode V1 component
+decodedV1 = huffmandeco(dV1, RedV1HuffDict);
+%Turn the component from a vector back into an array
+decodedV1 = reshape(decodedV1, [256, 256]);
+
+
+%Decode D1 component
+decodedD1 = huffmandeco(dD1, RedD1HuffDict);
+%Turn the component from a vector back into an array
+decodedD1 = reshape(decodedD1, [256, 256]);
+%----------------- DECODE RED COMPONENTS --------------------------------%
+
+
+%----------------- DECODE GREEN COMPONENTS -------------------------------%
+%Decode A2 component
+decodedA2 = huffmandeco(dA2, GreenA2HuffDict);
+%Turn the component from a vector back into an array
+decodedA2 = reshape(decodedA2, [256, 256]);
+
+
+%Decode H2 component
+decodedH2 = huffmandeco(dH2, GreenH2HuffDict);
+%Turn the component from a vector back into an array
+decodedH2 = reshape(decodedH2, [256, 256]);
+
+
+%Decode V2 component
+decodedV2 = huffmandeco(dV2, GreenV2HuffDict);
+%Turn the component from a vector back into an array
+decodedV2 = reshape(decodedV2, [256, 256]);
+
+
+%Decode D2 component
+decodedD2 = huffmandeco(dD2, GreenD2HuffDict);
+%Turn the component from a vector back into an array
+decodedD2 = reshape(decodedD2, [256, 256]);
+%----------------- DECODE GREEN COMPONENTS -------------------------------%
+
+
+%----------------- DECODE BLUE COMPONENTS --------------------------------%
+%Decode A3 component
+decodedA3 = huffmandeco(dA3, BlueA3HuffDict);
+%Turn the component from a vector back into an array
+decodedA3 = reshape(decodedA3, [256, 256]);
+
+
+%Decode H3 component
+decodedH3 = huffmandeco(dH3, BlueH3HuffDict);
+%Turn the component from a vector back into an array
+decodedH3 = reshape(decodedH3, [256, 256]);
+
+
+%Decode V3 component
+decodedV3 = huffmandeco(dV3, BlueV3HuffDict);
+%Turn the component from a vector back into an array
+decodedV3 = reshape(decodedV3, [256, 256]);
+
+
+%Decode D3 component
+decodedD3 = huffmandeco(dD3, BlueD3HuffDict);
+%Turn the component from a vector back into an array
+decodedD3 = reshape(decodedD3, [256, 256]);
+%----------------- DECODE BLUE COMPONENTS --------------------------------%
+
+
+% to be used in the reconstruction REMOVE IN FINAL SUBMISSION ------%
+%Recompose image into color channels using inverse wavelet transform and
+%approximation, horizantal, vertical, and diagonal components
+decrX1 = uint8(idwt2(decodedA1,decodedH1,decodedV1,decodedD1,wavelet));
+decrX2 = uint8(idwt2(decodedA2,decodedH2,decodedV2,decodedD2,wavelet));
+decrX3 = uint8(idwt2(decodedA3,decodedH3,decodedV3,decodedD3,wavelet));
+%--------------------------------------------------------------------%
+
+%Reconstruct image using the 3 color channels
+decQ(:,:,1)=decrX1;
+decQ(:,:,2)=decrX2;
+decQ(:,:,3)=decrX3;
+
+%Show reconstructed compressed image
+figure;
+imwrite(decQ,'decOut.png');
+imshow(decQ);
