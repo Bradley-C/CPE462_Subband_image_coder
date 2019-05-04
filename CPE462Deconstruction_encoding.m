@@ -2,7 +2,7 @@ clc;
 close all;
 clear all; %#ok<*CLALL>
 
-% Input the image file
+% Input the image file (I think image need to be .png to work correctly)
 X=uint8(imread('colorwheel.png'));
 
 % Create new image to compare to output
@@ -22,8 +22,8 @@ title('Original image');
 % define the decomposition wavelet type and how many levels thershhold
 % levels to use for quantization
 wavelet = 'haar'; %type of decompisition
-N=10; %levels to quantize image by (can be 1 to 20)
-
+%Get levels to quantize image by (can be 1 to 20) from user
+N = input("Enter desired quanitization level between 1 and 20 (lower level = more compression): ");
 % Perform a level 1 decomposition of the image along the RGB channels
 [cA1,cH1,cV1,cD1] = dwt2(X1,wavelet);
 [cA2,cH2,cV2,cD2] = dwt2(X2,wavelet);
@@ -79,6 +79,7 @@ Q(:,:,3)=rX3;
 figure;
 imwrite(Q,'out.png');
 imshow(Q);
+title("Compressed image no encoding");
 
 %---------------- HUFFMAN ENCODING ----------------------------%   
 
@@ -97,14 +98,6 @@ prob=prob/sum(prob);
 
 %Encode the red approximation component using the dictionary for it
 encodedA1 = huffmanenco(A1Vec, RedA1HuffDict);
-
-%THESE WILL BE MOVED TO THE DECODER AND ARE JUST FOR TESTING ------%
-%Decode the component
-% decodedA1 = huffmandeco(encodedA1, RedA1HuffDict);
-% 
-% %Turn the component from a vector back into an array
-% remadeqcA1 = reshape(decodedA1, [256, 256]);
-%-------------------------REMOVE LATER ----------------------------------%
 
 
 %Encode horizantal red channel component (qcH1)
@@ -446,25 +439,25 @@ dD3 = fileData;
 %Decode A1 component
 decodedA1 = huffmandeco(dA1, RedA1HuffDict);
 %Turn the component from a vector back into an array
-decodedA1 = reshape(decodedA1, [256, 256]);
+decodedA1 = reshape(decodedA1, [height, width]);
 
 
 %Decode H1 component
 decodedH1 = huffmandeco(dH1, RedH1HuffDict);
 %Turn the component from a vector back into an array
-decodedH1 = reshape(decodedH1, [256, 256]);
+decodedH1 = reshape(decodedH1, [height, width]);
 
 
 %Decode V1 component
 decodedV1 = huffmandeco(dV1, RedV1HuffDict);
 %Turn the component from a vector back into an array
-decodedV1 = reshape(decodedV1, [256, 256]);
+decodedV1 = reshape(decodedV1, [height, width]);
 
 
 %Decode D1 component
 decodedD1 = huffmandeco(dD1, RedD1HuffDict);
 %Turn the component from a vector back into an array
-decodedD1 = reshape(decodedD1, [256, 256]);
+decodedD1 = reshape(decodedD1, [height, width]);
 %----------------- DECODE RED COMPONENTS --------------------------------%
 
 
@@ -472,25 +465,25 @@ decodedD1 = reshape(decodedD1, [256, 256]);
 %Decode A2 component
 decodedA2 = huffmandeco(dA2, GreenA2HuffDict);
 %Turn the component from a vector back into an array
-decodedA2 = reshape(decodedA2, [256, 256]);
+decodedA2 = reshape(decodedA2, [height, width]);
 
 
 %Decode H2 component
 decodedH2 = huffmandeco(dH2, GreenH2HuffDict);
 %Turn the component from a vector back into an array
-decodedH2 = reshape(decodedH2, [256, 256]);
+decodedH2 = reshape(decodedH2, [height, width]);
 
 
 %Decode V2 component
 decodedV2 = huffmandeco(dV2, GreenV2HuffDict);
 %Turn the component from a vector back into an array
-decodedV2 = reshape(decodedV2, [256, 256]);
+decodedV2 = reshape(decodedV2, [height, width]);
 
 
 %Decode D2 component
 decodedD2 = huffmandeco(dD2, GreenD2HuffDict);
 %Turn the component from a vector back into an array
-decodedD2 = reshape(decodedD2, [256, 256]);
+decodedD2 = reshape(decodedD2, [height, width]);
 %----------------- DECODE GREEN COMPONENTS -------------------------------%
 
 
@@ -498,35 +491,34 @@ decodedD2 = reshape(decodedD2, [256, 256]);
 %Decode A3 component
 decodedA3 = huffmandeco(dA3, BlueA3HuffDict);
 %Turn the component from a vector back into an array
-decodedA3 = reshape(decodedA3, [256, 256]);
+decodedA3 = reshape(decodedA3, [height, width]);
 
 
 %Decode H3 component
 decodedH3 = huffmandeco(dH3, BlueH3HuffDict);
 %Turn the component from a vector back into an array
-decodedH3 = reshape(decodedH3, [256, 256]);
+decodedH3 = reshape(decodedH3, [height, width]);
 
 
 %Decode V3 component
 decodedV3 = huffmandeco(dV3, BlueV3HuffDict);
 %Turn the component from a vector back into an array
-decodedV3 = reshape(decodedV3, [256, 256]);
+decodedV3 = reshape(decodedV3, [height, width]);
 
 
 %Decode D3 component
 decodedD3 = huffmandeco(dD3, BlueD3HuffDict);
 %Turn the component from a vector back into an array
-decodedD3 = reshape(decodedD3, [256, 256]);
+decodedD3 = reshape(decodedD3, [height, width]);
 %----------------- DECODE BLUE COMPONENTS --------------------------------%
 
 
-% to be used in the reconstruction REMOVE IN FINAL SUBMISSION ------%
 %Recompose image into color channels using inverse wavelet transform and
 %approximation, horizantal, vertical, and diagonal components
 decrX1 = uint8(idwt2(decodedA1,decodedH1,decodedV1,decodedD1,wavelet));
 decrX2 = uint8(idwt2(decodedA2,decodedH2,decodedV2,decodedD2,wavelet));
 decrX3 = uint8(idwt2(decodedA3,decodedH3,decodedV3,decodedD3,wavelet));
-%--------------------------------------------------------------------%
+
 
 %Reconstruct image using the 3 color channels
 decQ(:,:,1)=decrX1;
@@ -537,3 +529,5 @@ decQ(:,:,3)=decrX3;
 figure;
 imwrite(decQ,'decOut.png');
 imshow(decQ);
+title("Compressed image with encoding");
+
