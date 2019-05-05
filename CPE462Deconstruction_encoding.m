@@ -300,14 +300,13 @@ encodedStream = [encodedA1; 2; encodedH1; 2; encodedV1; 2; encodedD1; 2; encoded
 %encodedStream = [encodedA1; encodedH1; encodedV1; encodedD1; encodedA2; encodedH2; encodedV2; encodedD2; encodedA3; encodedH3; encodedV3; encodedD3];
 
 %Convert the stream to logical 1's and 0's 
-binEncodedStream = logical(encodedStream);
+% binEncodedStream = logical(encodedStream);
 
 %Write the encoded stream to a file
 fileID = fopen('binary.txt', 'w');
 fprintf(fileID, '%d\n', encodedStream);
 %fwrite(fileID, binEncodedStream, 'ubit1');
 
-%This file somehow comes out larger than the original image??
 fclose(fileID);
 
 %Read data out of file Not working
@@ -321,7 +320,6 @@ fclose(fileID);
 %This stuff will be in the decoding script
 %Import the data from the file
 fileData=importdata('binary.txt');
-%reshape(fileData, [], 1);
 
 
 %----------------- EXTRACT RED CHANNEL COMPONENTS ----------------------%
@@ -435,7 +433,6 @@ dD3 = fileData;
 %----------------- EXTRACT BLUE CHANNEL COMPONENTS ----------------------%
 
 %----------------- DECODE RED COMPONENTS --------------------------------%
-
 %Decode A1 component
 decodedA1 = huffmandeco(dA1, RedA1HuffDict);
 %Turn the component from a vector back into an array
@@ -530,4 +527,7 @@ figure;
 imwrite(decQ,'decOut.png');
 imshow(decQ);
 title("Compressed image with encoding");
+
+
+%TODO Calculate peak noise to signal ratio to determine performance
 
